@@ -1,16 +1,16 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms.fields import *
 from wtforms.validators import Required, Email, DataRequired
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     name = StringField(u'Username', validators=[DataRequired()])
     password = StringField(u'Password', validators=[DataRequired()])
 
     submit = SubmitField(u'Login')
 
 
-class MedicalRecordForm(Form):
+class MedicalRecordForm(FlaskForm):
     a_float = FloatField(u'A floating point number')
     a_decimal = DecimalField(u'Another floating point number')
     a_integer = IntegerField(u'An integer')
