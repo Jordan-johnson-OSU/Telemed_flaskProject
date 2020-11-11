@@ -22,3 +22,31 @@ class MedicalRecordForm(FlaskForm):
 
     submit = SubmitField(u'Submit')
 
+## added by mroyster temporarily
+class IndexForm(FlaskForm):
+    hello = SubmitField(u'Hello')
+
+class CreateMedicalRecord(FlaskForm):
+    # Fields for Diagnosis
+    disease = StringField(u'Disease', validators=[DataRequired()])
+    condition = StringField(u'Condition', validators=[DataRequired()])
+    treatment = StringField(u'Treatment', validators=[DataRequired()])
+    
+    # Fields for prescription class
+    scriptMedication = StringField(u'Medication', validators=[DataRequired()])
+    scriptStrength = StringField(u'Strength', validators=[DataRequired()])
+    scriptDirections = StringField(u'Directions', validators=[DataRequired()])
+        
+    # Fields for doctor class (also gets tied to prescription class)
+    doctorID = StringField(u'Doctor ID', validators=[DataRequired()])
+    doctorFirstName = StringField(u'Doctor First Name', validators=[DataRequired()])
+    doctorLastName = StringField(u'Doctor Last Name', validators=[DataRequired()])
+    doctorProvider = StringField(u'Provider', validators=[DataRequired()])
+
+    # Fields for patient class
+    patient = StringField(u'Patient', validators=[DataRequired()])
+
+    # Fields for all classes
+    date = DateTimeField(u'Date', validators=[DataRequired()])
+
+    create = SubmitField(u'Create')
