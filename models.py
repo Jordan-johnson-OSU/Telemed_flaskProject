@@ -32,5 +32,7 @@ class Patient(db.Model):
     def __repr__(self):
         return '<User %r %r>' % self.first_name % self.last_name
 
-
+# TODO
+# Create Doctor and Diagnosis model
+# create relationships between all the models
 

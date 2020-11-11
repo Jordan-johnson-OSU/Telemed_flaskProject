@@ -6,6 +6,7 @@ from flask_appconfig import AppConfig
 from flask_bootstrap import Bootstrap
 from flask_nav.elements import Navbar, Subgroup, Link
 from flask_sqlalchemy import SQLAlchemy
+from models import *
 
 
 from forms import *
@@ -40,7 +41,7 @@ nav.register_element('frontend_top', Navbar(
     Subgroup(
         'Medical Records',
         Link('My Medical Records', 'medicalRecord/list'),
-        Link('Create New', 'medicalRecord/new'),
+        Link('Create New', 'new'),
         Link('Find Patient Medical Records', 'medicalRecord/search'),),
     Subgroup(
         'Payments',
@@ -116,15 +117,24 @@ def list_medical_records():
     return render_template('recordList.html')
 
 
-@app.route('/medicalRecord/new')
+@app.route('/new', methods=['GET','POST'])
 def create_medical_record():
-    return render_template('recordForm.html')
+    form = CreateMedicalRecord()
+
+    if form.validate_on_submit():
+        # if good then create patient and add to the database
+        # patient = Patient(form.patientFirstName, form.patientLastName, form.patientEmail)
+        # db.session.add(patient)
+        return render_template('recordList.html')
+        # return flask.redirect(flask.request.args.get('next') or flask.url_for('home'))
+
+    return render_template('recordForm.html', form=form)
 
 
 @app.route('/medicalRecord/<record>')
 def show_medical_record(record):
-    print('Medical Record  %d' % record)
-    return render_template('recordForm.html')
+    print('Medical Record  %s' % record)
+    return render_template('recordList.html')
 
 
 app.run(debug=True)

@@ -24,7 +24,7 @@ class MedicalRecordForm(FlaskForm):
 
 ## added by mroyster temporarily
 class IndexForm(FlaskForm):
-    hello = SubmitField(u'Hello')
+    hello = SubmitField(u'test')
 
 class CreateMedicalRecord(FlaskForm):
     # Fields for Diagnosis
@@ -44,9 +44,11 @@ class CreateMedicalRecord(FlaskForm):
     doctorProvider = StringField(u'Provider', validators=[DataRequired()])
 
     # Fields for patient class
-    patient = StringField(u'Patient', validators=[DataRequired()])
+    patientFirstName = StringField(u'Patient First name', validators=[DataRequired()])
+    patientLastName = StringField(u'Patient Last name', validators=[DataRequired()])
+    patientEmail = StringField(u'Patient Email', validators=[DataRequired()])
 
     # Fields for all classes
-    date = DateTimeField(u'Date', validators=[DataRequired()])
+    # date = DateTimeField(u'Date', validators=[DataRequired()])
 
     create = SubmitField(u'Create')
