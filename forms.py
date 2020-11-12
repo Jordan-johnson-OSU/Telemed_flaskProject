@@ -24,26 +24,28 @@ class MedicalRecordForm(FlaskForm):
 
 ## added by mroyster temporarily
 class IndexForm(FlaskForm):
+    s1 = StringField(u'Disease', validators=[DataRequired()])
+    s2 = StringField(u'Disease', validators=[DataRequired()])
     hello = SubmitField(u'test')
 
 class CreateMedicalRecord(FlaskForm):
-    # Fields for Diagnosis
+    # DIAGNOSIS
     disease = StringField(u'Disease', validators=[DataRequired()])
     condition = StringField(u'Condition', validators=[DataRequired()])
     treatment = StringField(u'Treatment', validators=[DataRequired()])
     
-    # Fields for prescription class
+    # PRESCRIPTION
     scriptMedication = StringField(u'Medication', validators=[DataRequired()])
     scriptStrength = StringField(u'Strength', validators=[DataRequired()])
     scriptDirections = StringField(u'Directions', validators=[DataRequired()])
         
-    # Fields for doctor class (also gets tied to prescription class)
+    # DOCTOR (also gets tied to prescription class)
     doctorID = StringField(u'Doctor ID', validators=[DataRequired()])
     doctorFirstName = StringField(u'Doctor First Name', validators=[DataRequired()])
     doctorLastName = StringField(u'Doctor Last Name', validators=[DataRequired()])
     doctorProvider = StringField(u'Provider', validators=[DataRequired()])
 
-    # Fields for patient class
+    # PATIENT
     patientFirstName = StringField(u'Patient First name', validators=[DataRequired()])
     patientLastName = StringField(u'Patient Last name', validators=[DataRequired()])
     patientEmail = StringField(u'Patient Email', validators=[DataRequired()])

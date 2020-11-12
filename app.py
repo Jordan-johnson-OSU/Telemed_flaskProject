@@ -1,18 +1,15 @@
 import os
 import flask
-from flask import render_template
+from flask import render_template, url_for, request, redirect
 from flask import Flask
 from flask_appconfig import AppConfig
 from flask_bootstrap import Bootstrap
 from flask_nav.elements import Navbar, Subgroup, Link
 from flask_sqlalchemy import SQLAlchemy
-from models import *
-
-
 from forms import *
 # from models import *
-
 from nav import nav
+
 
 # Init some things
 app = Flask(__name__, instance_relative_config=True)
@@ -21,7 +18,6 @@ app.config.from_mapping(
     DATABASE=os.path.join(app.instance_path, 'telemedicine.sqlite'),
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
-
 
 # login_manager = LoginManager()
 # login_manager.init_app(app)
@@ -61,9 +57,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data/telemedicine.db'
 db = SQLAlchemy(app)
 
 # we may want ot drop it and create it every time for testing
-# db.drop_all()
+db.drop_all()
 db.create_all()
-
 
 @app.route('/')
 def index():
@@ -119,16 +114,31 @@ def list_medical_records():
 
 @app.route('/new', methods=['GET','POST'])
 def create_medical_record():
-    form = CreateMedicalRecord()
+    form = IndexForm()
 
     if form.validate_on_submit():
-        # if good then create patient and add to the database
-        # patient = Patient(form.patientFirstName, form.patientLastName, form.patientEmail)
-        # db.session.add(patient)
+        if request.method == 'POST':
+            
+            # if good then create patient,doctor,diagnosis,prescription and add to the database
+            test = IndexTest()
+            # patient = Patient(first_name=form.patientFirstName, last_name=form.patientLastName, email=form.patientEmail)
+            # doctor = Doctor(form.doctorID, form.doctorFirstName, form.doctorLastName, form.doctorProvider)
+            # diagnosis = Diagnosis(form.disease, form.condition, form.treatment)
+            # prescription = Prescription(form.scriptMedication, form.scriptStrength, form.scriptDirections)
+            # try:
+            #     # Add to database
+            #     # db.session.add(patient)
+            #     # db.session.add(doctor)
+            #     # db.session.add(diagnosis)
+            #     # db.session.add(prescription)
+            #     # db.session.commit()
+            # except:
+            #     return 'There was an error with the database'
+
         return render_template('recordList.html')
         # return flask.redirect(flask.request.args.get('next') or flask.url_for('home'))
-
-    return render_template('recordForm.html', form=form)
+    else: 
+        return render_template('recordForm.html', form=form)
 
 
 @app.route('/medicalRecord/<record>')
