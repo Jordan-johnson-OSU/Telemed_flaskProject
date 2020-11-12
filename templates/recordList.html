@@ -6,6 +6,41 @@
    <div class="container">
        <div class="col-md-12">
             TODO: Build List
+            <table>
+                <tr>
+                    <th>Patient First Name</th>
+                    <th>Patient Last Name</th>
+                    <th>Email</th>
+                    <th>Doctor ID</th>
+                    <th>Doctor First Name</th>
+                    <th>Doctor Last Name</th>
+                    <th>Provider</th>
+                    <th>Disease</th>
+                    <th>Condition</th>
+                    <th>Treatment</th>
+                    <th>Medication</th>
+                    <th>Strength</th>
+                    <th>Directions</th>
+                </tr>
+                {% for record in records %}
+                    <tr>
+                        <td>{{ record.patientFirst }}</td>
+                        <td>{{ record.patientLast }}</td>
+                        <td>{{ record.email }}</td>
+                        <td>{{ record.doctorID }}</td>
+                        <td>{{ record.drFirst }}</td>
+                        <td>{{ record.drLast }}</td>
+                        <td>{{ record.provider }}</td>
+                        <td>{{ record.disease }}</td>
+                        <td>{{ record.condition }}</td>
+                        <td>{{ record.treatment }}</td>
+                        <td>{{ record.medication }}</td>
+                        <td>{{ record.strength }}</td>
+                        <td>{{ record.directions }}</td>
+                    </tr>
+
+                {% endfor %}
+            </table>
        </div>
    </div>
 {%- endblock %}

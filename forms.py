@@ -24,31 +24,30 @@ class MedicalRecordForm(FlaskForm):
 
 ## added by mroyster temporarily
 class IndexForm(FlaskForm):
-    s1 = StringField(u'Disease', validators=[DataRequired()])
-    s2 = StringField(u'Disease', validators=[DataRequired()])
+    s1 = StringField(u'Hello', validators=[DataRequired()])
     hello = SubmitField(u'test')
 
 class CreateMedicalRecord(FlaskForm):
     # DIAGNOSIS
-    disease = StringField(u'Disease', validators=[DataRequired()])
-    condition = StringField(u'Condition', validators=[DataRequired()])
-    treatment = StringField(u'Treatment', validators=[DataRequired()])
+    disease = StringField(u'Disease')
+    condition = StringField(u'Condition')
+    treatment = StringField(u'Treatment')
     
     # PRESCRIPTION
-    scriptMedication = StringField(u'Medication', validators=[DataRequired()])
-    scriptStrength = StringField(u'Strength', validators=[DataRequired()])
-    scriptDirections = StringField(u'Directions', validators=[DataRequired()])
+    scriptMedication = StringField(u'Medication')
+    scriptStrength = StringField(u'Strength')
+    scriptDirections = StringField(u'Directions')
         
     # DOCTOR (also gets tied to prescription class)
-    doctorID = StringField(u'Doctor ID', validators=[DataRequired()])
-    doctorFirstName = StringField(u'Doctor First Name', validators=[DataRequired()])
-    doctorLastName = StringField(u'Doctor Last Name', validators=[DataRequired()])
-    doctorProvider = StringField(u'Provider', validators=[DataRequired()])
+    doctorID = StringField(u'Doctor ID')
+    doctorFirstName = StringField(u'Doctor First Name')
+    doctorLastName = StringField(u'Doctor Last Name')
+    doctorProvider = StringField(u'Provider')
 
     # PATIENT
-    patientFirstName = StringField(u'Patient First name', validators=[DataRequired()])
-    patientLastName = StringField(u'Patient Last name', validators=[DataRequired()])
-    patientEmail = StringField(u'Patient Email', validators=[DataRequired()])
+    patientFirstName = StringField(u'Patient First name')
+    patientLastName = StringField(u'Patient Last name')
+    patientEmail = StringField(u'Patient Email')
 
     # Fields for all classes
     # date = DateTimeField(u'Date', validators=[DataRequired()])
