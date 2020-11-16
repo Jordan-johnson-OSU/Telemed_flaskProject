@@ -1,17 +1,15 @@
 import os
 import flask
-from flask import render_template
+from flask import render_template, url_for, request, redirect, flash
 from flask import Flask
 from flask_appconfig import AppConfig
 from flask_bootstrap import Bootstrap
 from flask_nav.elements import Navbar, Subgroup, Link
 from flask_sqlalchemy import SQLAlchemy
-
-
 from forms import *
 # from models import *
-
 from nav import nav
+
 
 # Init some things
 app = Flask(__name__, instance_relative_config=True)
@@ -20,7 +18,6 @@ app.config.from_mapping(
     DATABASE=os.path.join(app.instance_path, 'telemedicine.sqlite'),
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
-
 
 # login_manager = LoginManager()
 # login_manager.init_app(app)
@@ -39,8 +36,8 @@ nav.register_element('frontend_top', Navbar(
         Link('Join Appointment', 'home'), ),
     Subgroup(
         'Medical Records',
-        Link('My Medical Records', 'medicalRecord/list'),
-        Link('Create New', 'medicalRecord/new'),
+        Link('My Medical Records', 'list'),
+        Link('Create New', 'new'),
         Link('Find Patient Medical Records', 'medicalRecord/search'),),
     Subgroup(
         'Payments',
@@ -59,14 +56,16 @@ nav.init_app(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data/telemedicine.db'
 db = SQLAlchemy(app)
 
-# we may want ot drop it and create it every time for testing
-# db.drop_all()
-db.create_all()
+from models import *
 
+# we may want ot drop it and create it every time for testing
+db.drop_all()
+db.create_all()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    form = IndexForm()
+    return render_template('index.html', form=form)
 
 
 #
@@ -105,25 +104,75 @@ def home():
     return render_template('home.html')
 
 
+# Added by RoperFV, found on Flask 101
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    search = MedicalRecordForm(request.form)
+    if request.method == 'POST':
+        return search_medical_records(search)
+
+    return render_template('index.html', form=search)
+
+
+# Added by RoperFV, found on Flask 101
 @app.route('/medicalRecord/search')
-def search_medical_records():
-    return render_template('recordSearch.html')
+def search_medical_records(search):
+    results = []
+    search_string = search.data['search']
+    if search.data['search'] == '':
+        qry = db_session.query('PatientLast')
+        results = qry.all()
+    if not results:
+        flash('No results found!')
+        return redirect('/')
+    else:
+        # display results
+        return render_template('recordSearch.html', results=results)
 
 
-@app.route('/medicalRecord/list')
+@app.route('/list')
 def list_medical_records():
-    return render_template('recordList.html')
+    records = MedicalRecord.query.order_by(MedicalRecord.patientFirst).all()
+    return render_template('recordList.html', records=records)
 
 
-@app.route('/medicalRecord/new')
+@app.route('/new', methods=['GET','POST'])
 def create_medical_record():
-    return render_template('recordForm.html')
+    form = CreateMedicalRecord()
+
+    if form.validate_on_submit():
+        if request.method == 'POST':
+            record = MedicalRecord(patientFirst=form.patientFirstName.data,
+                patientLast=form.patientLastName.data,
+                email=form.patientEmail.data,
+                doctorID=form.doctorID.data,
+                drFirst=form.doctorFirstName.data,
+                drLast=form.doctorLastName.data,
+                provider= form.doctorProvider.data,
+                disease=form.disease.data,
+                condition=form.condition.data,
+                treatment=form.treatment.data,
+                medication=form.scriptMedication.data,
+                strength=form.scriptStrength.data,
+                directions=form.scriptDirections.data)
+                        
+            try:
+                db.session.add(record)
+                db.session.commit()
+                return redirect('/')
+            except:
+                return 'There was an error with the database'
+        records = MedicalRecord.query.order_by(MedicalRecord.patientFirst).all()
+        return render_template('recordList.html', records=records)
+        # return flask.redirect(flask.request.args.get('next') or flask.url_for('home'))
+    else: 
+        return render_template('recordForm.html', form=form)
 
 
 @app.route('/medicalRecord/<record>')
 def show_medical_record(record):
-    print('Medical Record  %d' % record)
-    return render_template('recordForm.html')
+    print('Medical Record  %s' % record)
+    return render_template('recordList.html')
 
-
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
