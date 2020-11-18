@@ -45,9 +45,9 @@ nav.register_element('frontend_top', Navbar(
         Link('Make Payment', 'home'),),
     Subgroup(
         'Prescriptions',
-        Link('My Prescriptions', 'home'),
+        Link('My Prescriptions', 'prescriptionList'),
         Link('Pending Prescription', 'home'),
-        Link('New Prescription', 'home'),),
+        Link('New Prescription', 'newPrescription'),),
     ))
 
 nav.init_app(app)
@@ -155,11 +155,10 @@ def create_medical_record():
                 medication=form.scriptMedication.data,
                 strength=form.scriptStrength.data,
                 directions=form.scriptDirections.data)
-                        
             try:
                 db.session.add(record)
                 db.session.commit()
-                return redirect('/')
+                return redirect('/list')
             except:
                 return 'There was an error with the database'
         records = MedicalRecord.query.order_by(MedicalRecord.patientFirst).all()
@@ -168,6 +167,30 @@ def create_medical_record():
     else: 
         return render_template('recordForm.html', form=form)
 
+@app.route('/newPrescription', methods=['GET','POST'])
+def create_prescription():
+    form = PrescriptionForm()
+    if form.validate_on_submit():
+        if request.method == 'POST':
+            prescription = Prescription(patientFirst=form.patientFirst.data,
+            patientLast=form.patientLast.data,
+            medication=form.medication.data,
+            strength=form.strength.data,
+            quantity=form.quantity.data,
+            directions=form.directions.data)
+        try:
+            db.session.add(prescription)
+            db.session.commit()
+            return redirect('/prescriptionList')
+        except:
+            return 'There was an error adding the prescription to the database'
+    else:
+        return render_template('prescriptionForm.html', form=form)
+
+@app.route('/prescriptionList')
+def list_prescriptions():
+    prescriptions = Prescription.query.order_by(Prescription.patientFirst).all()
+    return render_template('prescriptionList.html', prescriptions=prescriptions)
 
 @app.route('/medicalRecord/<record>')
 def show_medical_record(record):

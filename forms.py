@@ -28,6 +28,18 @@ class IndexForm(FlaskForm):
     s1 = StringField(u'Hello', validators=[DataRequired()])
     hello = SubmitField(u'test')
 
+# Prescription Form
+class PrescriptionForm(FlaskForm):
+    patientFirst = StringField(u'Patient First Name', validators=[DataRequired()])
+    patientLast = StringField(u'Patient Last Name', validators=[DataRequired()])
+    medication = StringField(u'Medication', validators=[DataRequired()])
+    strength = IntegerField(u'Strength', validators=[DataRequired()])
+    quantity = IntegerField(u'Quantity', validators=[DataRequired()])
+    directions = StringField(u'Directions', validators=[DataRequired()])
+    # Saved for later
+    # sentToPharmacy = StringField(u'Hello', validators=[DataRequired()])
+    create = SubmitField(u'Create')
+
 class CreateMedicalRecord(FlaskForm):
     # DIAGNOSIS
     disease = StringField(u'Disease')
