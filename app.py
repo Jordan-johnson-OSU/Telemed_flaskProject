@@ -1,6 +1,6 @@
 import os
 import flask
-from flask import render_template, url_for, request, redirect
+from flask import render_template, url_for, request, redirect, flash
 from flask import Flask
 from flask_appconfig import AppConfig
 from flask_bootstrap import Bootstrap
@@ -104,9 +104,30 @@ def home():
     return render_template('home.html')
 
 
+# Added by RoperFV, found on Flask 101
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    search = MedicalRecordForm(request.form)
+    if request.method == 'POST':
+        return search_medical_records(search)
+
+    return render_template('index.html', form=search)
+
+
+# Added by RoperFV, found on Flask 101
 @app.route('/medicalRecord/search')
-def search_medical_records():
-    return render_template('recordSearch.html')
+def search_medical_records(search):
+    results = []
+    search_string = search.data['search']
+    if search.data['search'] == '':
+        qry = db_session.query('PatientLast')
+        results = qry.all()
+    if not results:
+        flash('No results found!')
+        return redirect('/')
+    else:
+        # display results
+        return render_template('recordSearch.html', results=results)
 
 
 @app.route('/list')
