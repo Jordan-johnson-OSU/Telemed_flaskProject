@@ -54,9 +54,12 @@ class Diagnosis(db.Model):
 
 class Prescription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    medication = db.Column(db.String(50))
-    strength = db.Column(db.String(50))
-    directions = db.Column(db.String(80))
+    patientFirst = db.Column(db.String(50), nullable=False)
+    patientLast = db.Column(db.String(50), nullable=False)
+    medication = db.Column(db.String(50), nullable=False)
+    strength = db.Column(db.String(50), nullable=False)
+    quantity = db.Column(db.Integer(), nullable=False)
+    directions = db.Column(db.String(80), nullable=False)
 
 class MedicalRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
