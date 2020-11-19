@@ -5,7 +5,32 @@
 {% block content %}
    <div class="container">
        <div class="col-md-12">
-            {{wtf.quick_form(form)}}
+
+            <ul class="nav nav-tabs">
+              <li class="active"><a data-toggle="tab" href="#diagnosis">Diagnosis</a></li>
+              <li><a data-toggle="tab" href="#patient">Patient</a></li>
+              <li><a data-toggle="tab" href="#allergy">Allergy</a></li>
+            </ul>
+           <div class="tab-content">
+              <div id="diagnosis" class="tab-pane fade in active">
+                <h3>Diagnosis</h3>
+                <p>Enter the Diagnosis for Patient.....</p>
+                  {{wtf.quick_form(diagnosisForm)}}
+              </div>
+              <div id="patient" class="tab-pane fade">
+                <h3>Patient</h3>
+                <p>Create a Patient medical record.</p>
+                  {{wtf.quick_form(patientForm)}}
+              </div>
+               <div id="allergy" class="tab-pane fade">
+                <h3>Allergy</h3>
+                <p>Create a Allergy medical record.</p>
+                  {{wtf.quick_form(allergyForm)}}
+              </div>
+            </div>
+    {##
+        {{wtf.quick_form(form)}}
+    #}
        </div>
    </div>
 {%- endblock %}

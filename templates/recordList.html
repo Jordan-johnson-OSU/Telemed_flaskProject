@@ -3,47 +3,85 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block content %}
-   <div class="container">
-       <div class="col-md-12">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Patient First Name</th>
-                    <th>Patient Last Name</th>
-                    <th>Email</th>
-                    <th>Doctor ID</th>
-                    <th>Doctor First Name</th>
-                    <th>Doctor Last Name</th>
-                    <th>Provider</th>
-                    <th>Disease</th>
-                    <th>Condition</th>
-                    <th>Treatment</th>
-                    <th>Medication</th>
-                    <th>Strength</th>
-                    <th>Directions</th>
-                </tr>
-                </thead>
-            <tbody>
-                {% for record in records %}
-                    <tr>
-                        <td>{{ record.patientFirst }}</td>
-                        <td>{{ record.patientLast }}</td>
-                        <td>{{ record.email }}</td>
-                        <td>{{ record.doctorID }}</td>
-                        <td>{{ record.drFirst }}</td>
-                        <td>{{ record.drLast }}</td>
-                        <td>{{ record.provider }}</td>
-                        <td>{{ record.disease }}</td>
-                        <td>{{ record.condition }}</td>
-                        <td>{{ record.treatment }}</td>
-                        <td>{{ record.medication }}</td>
-                        <td>{{ record.strength }}</td>
-                        <td>{{ record.directions }}</td>
-                    </tr>
+    <div class="container">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#diagnosis">Diagnosis</a></li>
+                <li><a data-toggle="tab" href="#patient">Patient</a></li>
+                <li><a data-toggle="tab" href="#allergy">Allergy</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="diagnosis" class="tab-pane fade in active">
+                    <h3>Diagnosis</h3>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Disease</th>
+                            <th>Condition</th>
+                            <th>Treatment</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for diag in diagnosis %}
+                            <tr>
+                                <td>{{ diag.disease }}</td>
+                                <td>{{ diag.condition }}</td>
+                                <td>{{ diag.treatment }}</td>
+                            </tr>
 
-                {% endfor %}
-            </tbody>
-            </table>
-       </div>
-   </div>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div id="patient" class="tab-pane fade">
+                    <h3>Patient</h3>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Patient First Name</th>
+                            <th>Patient Last Name</th>
+                            <th>Email</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for patient in patients %}
+                            <tr>
+                                <td>{{ patient.first_name }}</td>
+                                <td>{{ patient.last_name }}</td>
+                                <td>{{ patient.email }}</td>
+                            </tr>
+
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div id="allergy" class="tab-pane fade">
+                    <h3>Allergy</h3>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Patient First Name</th>
+                            <th>Patient Last Name</th>
+                            <th>Medication</th>
+                            <th>Description</th>
+                            <th>Created By</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for allergy in allergies %}
+                            <tr>
+                                <td>{{ allergy.patientFirstName }}</td>
+                                <td>{{ allergy.patientLastName }}</td>
+                                <td>{{ allergy.allergyMedication }}</td>
+                                <td>{{ allergy.allergyDescription }}</td>
+                                <td>{{ allergy.createdBy }}</td>
+                            </tr>
+
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 {%- endblock %}

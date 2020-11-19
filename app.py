@@ -61,13 +61,6 @@ from models import *
 db.drop_all()
 db.create_all()
 
-
-@app.route('/')
-def index():
-    form = IndexForm()
-    return render_template('index.html', form=form)
-
-
 #
 # @login_manager.user_loader
 # def load_user(user_id):
@@ -107,65 +100,100 @@ def home():
 # Added by RoperFV, found on Flask 101
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    search = MedicalRecordForm(request.form)
-    if request.method == 'POST':
-        return search_medical_records(search)
-
-    return render_template('index.html', form=search)
+    return render_template('index.html')
 
 
 # Added by RoperFV, found on Flask 101
 @app.route('/medicalRecord/search')
-def search_medical_records(search):
-    results = []
-    search_string = search.data['search']
-    if search.data['search'] == '':
-        qry = db.session.query('PatientLast')
-        results = qry.all()
-    if not results:
-        flash('No results found!')
-        return redirect('/list')
-    else:
-        # display results
-        return render_template('recordSearch.html', results=results)
+def search_medical_records():
+    search = MedicalRecordForm()
+    if request.method == 'POST':
+        results = []
+        search_string = search.data['search']
+        if search.data['search'] == '':
+            qry = db.session.query('PatientLast')
+            results = qry.all()
+        if not results:
+            flash('No results found!')
+            return redirect('/list')
+        else:
+            # display results
+            return render_template('recordSearch.html', results=results)
+
+    return render_template('recordSearch.html', form=search)
 
 
 @app.route('/list')
 def list_medical_records():
-    records = MedicalRecord.query.order_by(MedicalRecord.patientFirst).all()
-    return render_template('recordList.html', records=records)
+    diagnosis = Diagnosis.query.order_by(Diagnosis.disease).all()
+    patients = Patient.query.order_by(Patient.first_name).all()
+    allergies = Allergy.query.order_by(Allergy.allergyMedication).all()
+    return render_template('recordList.html',
+                           diagnosis=diagnosis,
+                           patients=patients,
+                           allergies=allergies)
 
 
 @app.route('/new', methods=['GET', 'POST'])
 def create_medical_record():
-    form = CreateMedicalRecord()
+    # form = CreateMedicalRecord()
+    diagnosisForm = DiagnosisRecord()
+    patientForm = PatientRecord()
+    allergyForm = AllergyRecord()
 
-    if form.validate_on_submit():
-        if request.method == 'POST':
-            record = MedicalRecord(patientFirst=form.patientFirstName.data,
-                                   patientLast=form.patientLastName.data,
-                                   email=form.patientEmail.data,
-                                   doctorID=form.doctorID.data,
-                                   drFirst=form.doctorFirstName.data,
-                                   drLast=form.doctorLastName.data,
-                                   provider=form.doctorProvider.data,
-                                   disease=form.disease.data,
-                                   condition=form.condition.data,
-                                   treatment=form.treatment.data,
-                                   medication=form.scriptMedication.data,
-                                   strength=form.scriptStrength.data,
-                                   directions=form.scriptDirections.data)
-            try:
-                db.session.add(record)
-                db.session.commit()
-                return redirect('/list')
-            except:
-                return 'There was an error with the database'
-        records = MedicalRecord.query.order_by(MedicalRecord.patientFirst).all()
-        return render_template('recordList.html', records=records)
-        # return flask.redirect(flask.request.args.get('next') or flask.url_for('home'))
+    if request.method == 'POST':
+        if diagnosisForm.createDiagnosis.data:
+            print("diagnosisForm Is Submitted ", diagnosisForm.createDiagnosis.data)
+            if diagnosisForm.validate_on_submit():
+                    record = Diagnosis(disease=diagnosisForm.disease.data,
+                                       condition=diagnosisForm.condition.data,
+                                       treatment=diagnosisForm.treatment.data)
+                    try:
+                        db.session.add(record)
+                        db.session.commit()
+                        return redirect('/list')
+                    except:
+                        print("ERROR Diagnosis Record Creation")
+                        return 'There was an error with the database'
+
+        elif patientForm.createPatient.data:
+            print("patientForm Is Submitted ", patientForm.createPatient.data)
+            if patientForm.validate_on_submit():
+                    record = Patient(first_name=patientForm.patientFirstName.data,
+                                     last_name=patientForm.patientLastName.data,
+                                     email=patientForm.patientEmail.data)
+                    try:
+                        db.session.add(record)
+                        db.session.commit()
+                        return redirect('/list')
+                    except:
+                        print("ERROR Patient Record Creation")
+                        return 'There was an error with the database'
+
+        elif allergyForm.createAllergy.data:
+            print("allergyForm Is Submitted ", allergyForm.createAllergy.data)
+            if allergyForm.validate_on_submit():
+                    record = Allergy(patientFirstName=allergyForm.patientFirstName.data,
+                                     patientLastName=allergyForm.patientLastName.data,
+                                     allergyMedication=allergyForm.allergyMedication.data,
+                                     allergyDescription=allergyForm.allergyDescription.data,
+                                     # dateEntered=allergyForm.dateEntered.data,
+                                     createdBy=allergyForm.createdBy.data)
+
+                    try:
+                        db.session.add(record)
+                        db.session.commit()
+                        print("Allergy created")
+                        return redirect('/list')
+                    except:
+                        print("ERROR Allergy Record Creation")
+                        return 'There was an error with the database'
     else:
-        return render_template('recordForm.html', form=form)
+        return render_template('recordForm.html',
+                               diagnosisForm=diagnosisForm,
+                               patientForm=patientForm,
+                               allergyForm=allergyForm)
+    return redirect('/home')
 
 
 @app.route('/newPrescription', methods=['GET', 'POST'])

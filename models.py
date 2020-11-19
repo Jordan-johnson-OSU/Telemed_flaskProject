@@ -2,6 +2,7 @@ from app import db
 
 # See Flask-alchemy documentation : https://flask-sqlalchemy.palletsprojects.com/en/2.x/
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(80), unique=True, nullable=False)
@@ -32,12 +33,14 @@ class Patient(db.Model):
     def __repr__(self):
         return '<User %r %r>' % self.first_name % self.last_name
 
+
 # TODO
 # Create Doctor and Diagnosis model
 # create relationships between all the models
 class IndexTest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     s1 = db.Column(db.String(50), unique=True, nullable=False)
+
 
 class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,11 +49,23 @@ class Doctor(db.Model):
     last_name = db.Column(db.String(50))
     provider = db.Column(db.String(50))
 
+
+class Allergy(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patientFirstName = db.Column(db.String(50))
+    patientLastName = db.Column(db.String(50))
+    allergyMedication = db.Column(db.String(50))
+    allergyDescription = db.Column(db.String(500))
+    # dateEntered = db.Column(db.Date())
+    createdBy = db.Column(db.String(50))
+
+
 class Diagnosis(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     disease = db.Column(db.String(50))
     condition = db.Column(db.String(50))
     treatment = db.Column(db.String(50))
+
 
 class Prescription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -60,6 +75,7 @@ class Prescription(db.Model):
     strength = db.Column(db.String(50), nullable=False)
     quantity = db.Column(db.Integer(), nullable=False)
     directions = db.Column(db.String(80), nullable=False)
+
 
 class MedicalRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
