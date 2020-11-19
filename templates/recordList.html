@@ -5,8 +5,8 @@
 {% block content %}
    <div class="container">
        <div class="col-md-12">
-            TODO: Build List
-            <table>
+            <table class="table">
+                <thead>
                 <tr>
                     <th>Patient First Name</th>
                     <th>Patient Last Name</th>
@@ -22,6 +22,8 @@
                     <th>Strength</th>
                     <th>Directions</th>
                 </tr>
+                </thead>
+            <tbody>
                 {% for record in records %}
                     <tr>
                         <td>{{ record.patientFirst }}</td>
@@ -40,6 +42,7 @@
                     </tr>
 
                 {% endfor %}
+            </tbody>
             </table>
        </div>
    </div>

@@ -10,7 +10,6 @@ from forms import *
 # from models import *
 from nav import nav
 
-
 # Init some things
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_mapping(
@@ -38,17 +37,17 @@ nav.register_element('frontend_top', Navbar(
         'Medical Records',
         Link('My Medical Records', 'list'),
         Link('Create New', 'new'),
-        Link('Find Patient Medical Records', 'medicalRecord/search'),),
+        Link('Find Patient Medical Records', 'medicalRecord/search'), ),
     Subgroup(
         'Payments',
         Link('My Payment Records', 'home'),
-        Link('Make Payment', 'home'),),
+        Link('Make Payment', 'home'), ),
     Subgroup(
         'Prescriptions',
         Link('My Prescriptions', 'prescriptionList'),
         Link('Pending Prescription', 'home'),
-        Link('New Prescription', 'newPrescription'),),
-    ))
+        Link('New Prescription', 'newPrescription'), ),
+))
 
 nav.init_app(app)
 
@@ -61,6 +60,7 @@ from models import *
 # we may want ot drop it and create it every time for testing
 db.drop_all()
 db.create_all()
+
 
 @app.route('/')
 def index():
@@ -120,11 +120,11 @@ def search_medical_records(search):
     results = []
     search_string = search.data['search']
     if search.data['search'] == '':
-        qry = db_session.query('PatientLast')
+        qry = db.session.query('PatientLast')
         results = qry.all()
     if not results:
         flash('No results found!')
-        return redirect('/')
+        return redirect('/list')
     else:
         # display results
         return render_template('recordSearch.html', results=results)
@@ -136,25 +136,25 @@ def list_medical_records():
     return render_template('recordList.html', records=records)
 
 
-@app.route('/new', methods=['GET','POST'])
+@app.route('/new', methods=['GET', 'POST'])
 def create_medical_record():
     form = CreateMedicalRecord()
 
     if form.validate_on_submit():
         if request.method == 'POST':
             record = MedicalRecord(patientFirst=form.patientFirstName.data,
-                patientLast=form.patientLastName.data,
-                email=form.patientEmail.data,
-                doctorID=form.doctorID.data,
-                drFirst=form.doctorFirstName.data,
-                drLast=form.doctorLastName.data,
-                provider= form.doctorProvider.data,
-                disease=form.disease.data,
-                condition=form.condition.data,
-                treatment=form.treatment.data,
-                medication=form.scriptMedication.data,
-                strength=form.scriptStrength.data,
-                directions=form.scriptDirections.data)
+                                   patientLast=form.patientLastName.data,
+                                   email=form.patientEmail.data,
+                                   doctorID=form.doctorID.data,
+                                   drFirst=form.doctorFirstName.data,
+                                   drLast=form.doctorLastName.data,
+                                   provider=form.doctorProvider.data,
+                                   disease=form.disease.data,
+                                   condition=form.condition.data,
+                                   treatment=form.treatment.data,
+                                   medication=form.scriptMedication.data,
+                                   strength=form.scriptStrength.data,
+                                   directions=form.scriptDirections.data)
             try:
                 db.session.add(record)
                 db.session.commit()
@@ -164,20 +164,21 @@ def create_medical_record():
         records = MedicalRecord.query.order_by(MedicalRecord.patientFirst).all()
         return render_template('recordList.html', records=records)
         # return flask.redirect(flask.request.args.get('next') or flask.url_for('home'))
-    else: 
+    else:
         return render_template('recordForm.html', form=form)
 
-@app.route('/newPrescription', methods=['GET','POST'])
+
+@app.route('/newPrescription', methods=['GET', 'POST'])
 def create_prescription():
     form = PrescriptionForm()
     if form.validate_on_submit():
         if request.method == 'POST':
             prescription = Prescription(patientFirst=form.patientFirst.data,
-            patientLast=form.patientLast.data,
-            medication=form.medication.data,
-            strength=form.strength.data,
-            quantity=form.quantity.data,
-            directions=form.directions.data)
+                                        patientLast=form.patientLast.data,
+                                        medication=form.medication.data,
+                                        strength=form.strength.data,
+                                        quantity=form.quantity.data,
+                                        directions=form.directions.data)
         try:
             db.session.add(prescription)
             db.session.commit()
@@ -187,15 +188,18 @@ def create_prescription():
     else:
         return render_template('prescriptionForm.html', form=form)
 
+
 @app.route('/prescriptionList')
 def list_prescriptions():
     prescriptions = Prescription.query.order_by(Prescription.patientFirst).all()
     return render_template('prescriptionList.html', prescriptions=prescriptions)
 
+
 @app.route('/medicalRecord/<record>')
 def show_medical_record(record):
     print('Medical Record  %s' % record)
     return render_template('recordList.html')
+
 
 if __name__ == "__main__":
     app.run(debug=True)

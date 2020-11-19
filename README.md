@@ -7,6 +7,8 @@ Our Telemedicine application is a web and mobile application enabling contactles
 
 Technical Details
 
+pip install -r requirements.txt
+
 Python 3
 pip install flask
 pip install flask_appconfig
@@ -22,3 +24,5 @@ The Project:
 https://flask.palletsprojects.com/en/1.1.x/
 https://flask-sqlalchemy.palletsprojects.com/en/2.x/
 https://getbootstrap.com/docs/3.3/
+
+
