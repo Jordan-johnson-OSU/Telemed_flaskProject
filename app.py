@@ -26,27 +26,27 @@ Bootstrap(app)
 
 # build the navigation
 nav.register_element('frontend_top', Navbar(
-    Link('Login', 'login'),
-    Link('Home', 'home'),
+    Link('Login', '/login'),
+    Link('Home', '/home'),
     Subgroup(
         'Appointments',
-        Link('Create Appointment', 'home'),
-        Link('View Past Appointments', 'home'),
-        Link('Join Appointment', 'home'), ),
+        Link('Create Appointment', '/home'),
+        Link('View Past Appointments', '/home'),
+        Link('Join Appointment', '/home'), ),
     Subgroup(
         'Medical Records',
-        Link('My Medical Records', 'list'),
-        Link('Create New', 'new'),
-        Link('Find Patient Medical Records', 'medicalRecord/search'), ),
+        Link('My Medical Records', '/list'),
+        Link('Create New', '/new'),
+        Link('Find Patient Medical Records', '/medicalRecord/search'), ),
     Subgroup(
         'Payments',
-        Link('My Payment Records', 'home'),
-        Link('Make Payment', 'home'), ),
+        Link('My Payment Records', '/home'),
+        Link('Make Payment', '/home'), ),
     Subgroup(
         'Prescriptions',
-        Link('My Prescriptions', 'prescriptionList'),
-        Link('Pending Prescription', 'home'),
-        Link('New Prescription', 'newPrescription'), ),
+        Link('My Prescriptions', '/prescriptionList'),
+        Link('Pending Prescription', '/home'),
+        Link('New Prescription', '/newPrescription'), ),
 ))
 
 nav.init_app(app)
@@ -57,9 +57,9 @@ db = SQLAlchemy(app)
 
 from models import *
 
-# we may want ot drop it and create it every time for testing
-db.drop_all()
-db.create_all()
+# we may want to drop it and create it every time for testing
+# db.drop_all()
+# db.create_all()
 
 #
 # @login_manager.user_loader
@@ -104,21 +104,46 @@ def index():
 
 
 # Added by RoperFV, found on Flask 101
-@app.route('/medicalRecord/search')
+@app.route('/medicalRecord/search', methods=['GET'])
 def search_medical_records():
+    form = MedicalRecordForm()
+
+    return render_template('recordSearch.html', form=form)
+
+
+@app.route('/medicalRecord/search', methods=['POST'])
+def medical_records_search_list():
     search = MedicalRecordForm()
-    if request.method == 'POST':
-        results = []
-        search_string = search.data['search']
-        if search.data['search'] == '':
-            qry = db.session.query('PatientLast')
-            results = qry.all()
-        if not results:
-            flash('No results found!')
-            return redirect('/list')
-        else:
-            # display results
-            return render_template('recordSearch.html', results=results)
+
+    if search.search.data:
+        if search.validate_on_submit():
+            first = search.patientFirstName.data
+            last = search.patientLastName.data
+
+            # diagnosis = Diagnosis.query.order_by(Diagnosis.disease)
+            # patients = Patient.query.order_by(Patient.first_name)
+            # allergies = Allergy.query.order_by(Allergy.allergyMedication)
+
+            diagnosis = db.session.query(Diagnosis)
+            patients = db.session.query(Patient)
+            allergies = db.session.query(Allergy)
+
+            if first:
+                print('First ', first)
+                # diagnosis = diagnosis.filter(Allergy.patientFirstName == first)
+                patients = patients.filter(Patient.first_name == first)
+                allergies = allergies.filter(Allergy.patientFirstName == first)
+
+            if last:
+                print('Last ', last)
+                # diagnosis = diagnosis.filter(Diagnosis. == last)
+                patients = patients.filter(Patient.last_name == last)
+                allergies = allergies.filter(Allergy.patientLastName == last)
+
+            return render_template('recordList.html',
+                                   diagnosis=diagnosis.all(),
+                                   patients=patients.all(),
+                                   allergies=allergies.all())
 
     return render_template('recordSearch.html', form=search)
 

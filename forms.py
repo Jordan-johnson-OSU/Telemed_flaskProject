@@ -88,7 +88,8 @@ class CreateMedicalRecord(FlaskForm):
     create = SubmitField(u'Create')
 
 
-class MedicalRecordForm(Form):
+class MedicalRecordForm(FlaskForm):
     patientFirstName = StringField(u'Patient First name')
     patientLastName = StringField(u'Patient Last name')
     search = SubmitField(u'Search')
+
