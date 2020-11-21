@@ -1,11 +1,13 @@
 import os
+
 import flask
-from flask import render_template, url_for, request, redirect, flash
 from flask import Flask
+from flask import render_template, request, redirect
 from flask_appconfig import AppConfig
 from flask_bootstrap import Bootstrap
 from flask_nav.elements import Navbar, Subgroup, Link
 from flask_sqlalchemy import SQLAlchemy
+
 from forms import *
 # from models import *
 from nav import nav
@@ -56,6 +58,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data/telemedicine.db'
 db = SQLAlchemy(app)
 
 from models import *
+
 
 # we may want to drop it and create it every time for testing
 # db.drop_all()
@@ -150,9 +153,9 @@ def medical_records_search_list():
 
 @app.route('/list')
 def list_medical_records():
-    diagnosis = Diagnosis.query.order_by(Diagnosis.disease).all()
-    patients = Patient.query.order_by(Patient.first_name).all()
-    allergies = Allergy.query.order_by(Allergy.allergyMedication).all()
+    diagnosis = db.session.query(Diagnosis).order_by(Diagnosis.disease).all()
+    patients = db.session.query(Patient).order_by(Patient.first_name).all()
+    allergies = db.session.query(Allergy).order_by(Allergy.allergyMedication).all()
     return render_template('recordList.html',
                            diagnosis=diagnosis,
                            patients=patients,
@@ -162,67 +165,68 @@ def list_medical_records():
 @app.route('/new', methods=['GET', 'POST'])
 def create_medical_record():
     # form = CreateMedicalRecord()
-    diagnosisForm = DiagnosisRecord()
-    patientForm = PatientRecord()
-    allergyForm = AllergyRecord()
+    diagnosis_form = DiagnosisRecord()
+    patient_form = PatientRecord()
+    allergy_form = AllergyRecord()
 
     if request.method == 'POST':
-        if diagnosisForm.createDiagnosis.data:
-            print("diagnosisForm Is Submitted ", diagnosisForm.createDiagnosis.data)
-            if diagnosisForm.validate_on_submit():
-                    record = Diagnosis(disease=diagnosisForm.disease.data,
-                                       condition=diagnosisForm.condition.data,
-                                       treatment=diagnosisForm.treatment.data)
-                    try:
-                        db.session.add(record)
-                        db.session.commit()
-                        return redirect('/list')
-                    except:
-                        print("ERROR Diagnosis Record Creation")
-                        return 'There was an error with the database'
+        if diagnosis_form.createDiagnosis.data:
+            print("diagnosis_form Is Submitted ", diagnosis_form.createDiagnosis.data)
+            if diagnosis_form.validate_on_submit():
+                record = Diagnosis(disease=diagnosis_form.disease.data,
+                                   condition=diagnosis_form.condition.data,
+                                   treatment=diagnosis_form.treatment.data)
+                try:
+                    db.session.add(record)
+                    db.session.commit()
+                    return redirect('/list')
+                except:
+                    print("ERROR Diagnosis Record Creation")
+                    return 'There was an error with the database'
 
-        elif patientForm.createPatient.data:
-            print("patientForm Is Submitted ", patientForm.createPatient.data)
-            if patientForm.validate_on_submit():
-                    record = Patient(first_name=patientForm.patientFirstName.data,
-                                     last_name=patientForm.patientLastName.data,
-                                     email=patientForm.patientEmail.data)
-                    try:
-                        db.session.add(record)
-                        db.session.commit()
-                        return redirect('/list')
-                    except:
-                        print("ERROR Patient Record Creation")
-                        return 'There was an error with the database'
+        elif patient_form.createPatient.data:
+            print("patient_form Is Submitted ", patient_form.createPatient.data)
+            if patient_form.validate_on_submit():
+                record = Patient(first_name=patient_form.patientFirstName.data,
+                                 last_name=patient_form.patientLastName.data,
+                                 email=patient_form.patientEmail.data)
+                try:
+                    db.session.add(record)
+                    db.session.commit()
+                    return redirect('/list')
+                except:
+                    print("ERROR Patient Record Creation")
+                    return 'There was an error with the database'
 
-        elif allergyForm.createAllergy.data:
-            print("allergyForm Is Submitted ", allergyForm.createAllergy.data)
-            if allergyForm.validate_on_submit():
-                    record = Allergy(patientFirstName=allergyForm.patientFirstName.data,
-                                     patientLastName=allergyForm.patientLastName.data,
-                                     allergyMedication=allergyForm.allergyMedication.data,
-                                     allergyDescription=allergyForm.allergyDescription.data,
-                                     # dateEntered=allergyForm.dateEntered.data,
-                                     createdBy=allergyForm.createdBy.data)
+        elif allergy_form.createAllergy.data:
+            print("allergy_form Is Submitted ", allergy_form.createAllergy.data)
+            if allergy_form.validate_on_submit():
+                record = Allergy(patientFirstName=allergy_form.patientFirstName.data,
+                                 patientLastName=allergy_form.patientLastName.data,
+                                 allergyMedication=allergy_form.allergyMedication.data,
+                                 allergyDescription=allergy_form.allergyDescription.data,
+                                 # dateEntered=allergyForm.dateEntered.data,
+                                 createdBy=allergy_form.createdBy.data)
 
-                    try:
-                        db.session.add(record)
-                        db.session.commit()
-                        print("Allergy created")
-                        return redirect('/list')
-                    except:
-                        print("ERROR Allergy Record Creation")
-                        return 'There was an error with the database'
+                try:
+                    db.session.add(record)
+                    db.session.commit()
+                    print("Allergy created")
+                    return redirect('/list')
+                except:
+                    print("ERROR Allergy Record Creation")
+                    return 'There was an error with the database'
     else:
         return render_template('recordForm.html',
-                               diagnosisForm=diagnosisForm,
-                               patientForm=patientForm,
-                               allergyForm=allergyForm)
+                               diagnosisForm=diagnosis_form,
+                               patientForm=patient_form,
+                               allergyForm=allergy_form)
     return redirect('/home')
 
 
 @app.route('/newPrescription', methods=['GET', 'POST'])
 def create_prescription():
+    prescription = Prescription()
     form = PrescriptionForm()
     if form.validate_on_submit():
         if request.method == 'POST':
@@ -244,7 +248,7 @@ def create_prescription():
 
 @app.route('/prescriptionList')
 def list_prescriptions():
-    prescriptions = Prescription.query.order_by(Prescription.patientFirst).all()
+    prescriptions = db.session.query(Prescription).order_by(Prescription.patientFirst).all()
     return render_template('prescriptionList.html', prescriptions=prescriptions)
 
 
