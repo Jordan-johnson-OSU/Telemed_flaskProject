@@ -11,22 +11,11 @@ class LoginForm(FlaskForm):
     submit = SubmitField(u'Login')
 
 
-# Temporarily disabled by RoperFV
-
-#class MedicalRecordForm(FlaskForm):
-    #a_float = FloatField(u'A floating point number')
-    #a_decimal = DecimalField(u'Another floating point number')
-    #a_integer = IntegerField(u'An integer')
-   # now = DateTimeField(u'Current time', description='...for no particular reason')
-   # sample_file = FileField(u'Your favorite file')
-   # eula = BooleanField(u'I did not read the terms and conditions',
-   #                     validators=[DataRequired('You must agree to not agree!')])
-   # submit = SubmitField(u'Submit')
-
-## added by mroyster temporarily
+# added by mroyster temporarily
 class IndexForm(FlaskForm):
     s1 = StringField(u'Hello', validators=[DataRequired()])
     hello = SubmitField(u'test')
+
 
 # Prescription Form
 class PrescriptionForm(FlaskForm):
@@ -39,6 +28,37 @@ class PrescriptionForm(FlaskForm):
     # Saved for later
     # sentToPharmacy = StringField(u'Hello', validators=[DataRequired()])
     create = SubmitField(u'Create')
+
+
+class AllergyRecord(FlaskForm):
+    # allergy
+    patientFirstName = StringField(u'Patient First name')
+    patientLastName = StringField(u'Patient Last name')
+    allergyMedication = StringField(u'Allergic Medication')
+    allergyDescription = StringField(u'Allergic Description')
+    # dateEntered = DateField(u'Date Entered')
+    createdBy = StringField(u'Created By')
+
+    createAllergy = SubmitField(u'Create')
+
+
+class DiagnosisRecord(FlaskForm):
+    # diagnosis
+    disease = StringField(u'Disease')
+    condition = StringField(u'Condition')
+    treatment = StringField(u'Treatment')
+
+    createDiagnosis = SubmitField(u'Create')
+
+
+class PatientRecord(FlaskForm):
+    # allergy
+    patientFirstName = StringField(u'Patient First name')
+    patientLastName = StringField(u'Patient Last name')
+    patientEmail = StringField(u'Patient Email')
+
+    createPatient = SubmitField(u'Create')
+
 
 class CreateMedicalRecord(FlaskForm):
     # DIAGNOSIS
@@ -68,9 +88,8 @@ class CreateMedicalRecord(FlaskForm):
     create = SubmitField(u'Create')
 
 
-class MedicalRecordForm(Form):
-    choices = [('PatientLast', 'PatientFirst'),
-               ('Prescription', 'Strength'),
-               ('Condition', 'Diagnoses')]
-    select = SelectField('Search for records:', choices=choices)
-    search = StringField('')
+class MedicalRecordForm(FlaskForm):
+    patientFirstName = StringField(u'Patient First name')
+    patientLastName = StringField(u'Patient Last name')
+    search = SubmitField(u'Search')
+

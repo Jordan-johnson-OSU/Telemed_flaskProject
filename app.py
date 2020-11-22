@@ -1,11 +1,13 @@
 import os
+
 import flask
-from flask import render_template, url_for, request, redirect, flash
 from flask import Flask
+from flask import render_template, request, redirect
 from flask_appconfig import AppConfig
 from flask_bootstrap import Bootstrap
 from flask_nav.elements import Navbar, Subgroup, Link
 from flask_sqlalchemy import SQLAlchemy
+
 from forms import *
 # from models import *
 from nav import nav
@@ -26,27 +28,27 @@ Bootstrap(app)
 
 # build the navigation
 nav.register_element('frontend_top', Navbar(
-    Link('Login', 'login'),
-    Link('Home', 'home'),
+    Link('Login', '/login'),
+    Link('Home', '/home'),
     Subgroup(
         'Appointments',
-        Link('Create Appointment', 'home'),
-        Link('View Past Appointments', 'home'),
-        Link('Join Appointment', 'home'), ),
+        Link('Create Appointment', '/home'),
+        Link('View Past Appointments', '/home'),
+        Link('Join Appointment', '/home'), ),
     Subgroup(
         'Medical Records',
-        Link('My Medical Records', 'list'),
-        Link('Create New', 'new'),
-        Link('Find Patient Medical Records', 'medicalRecord/search'), ),
+        Link('My Medical Records', '/list'),
+        Link('Create New', '/new'),
+        Link('Find Patient Medical Records', '/medicalRecord/search'), ),
     Subgroup(
         'Payments',
-        Link('My Payment Records', 'home'),
-        Link('Make Payment', 'home'), ),
+        Link('My Payment Records', '/home'),
+        Link('Make Payment', '/home'), ),
     Subgroup(
         'Prescriptions',
-        Link('My Prescriptions', 'prescriptionList'),
-        Link('Pending Prescription', 'home'),
-        Link('New Prescription', 'newPrescription'), ),
+        Link('My Prescriptions', '/prescriptionList'),
+        Link('Pending Prescription', '/home'),
+        Link('New Prescription', '/newPrescription'), ),
 ))
 
 nav.init_app(app)
@@ -57,16 +59,10 @@ db = SQLAlchemy(app)
 
 from models import *
 
-# we may want ot drop it and create it every time for testing
-db.drop_all()
-db.create_all()
 
-
-@app.route('/')
-def index():
-    form = IndexForm()
-    return render_template('index.html', form=form)
-
+# we may want to drop it and create it every time for testing
+# db.drop_all()
+# db.create_all()
 
 #
 # @login_manager.user_loader
@@ -107,69 +103,130 @@ def home():
 # Added by RoperFV, found on Flask 101
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    search = MedicalRecordForm(request.form)
-    if request.method == 'POST':
-        return search_medical_records(search)
-
-    return render_template('index.html', form=search)
+    return render_template('index.html')
 
 
 # Added by RoperFV, found on Flask 101
-@app.route('/medicalRecord/search')
-def search_medical_records(search):
-    results = []
-    search_string = search.data['search']
-    if search.data['search'] == '':
-        qry = db.session.query('PatientLast')
-        results = qry.all()
-    if not results:
-        flash('No results found!')
-        return redirect('/list')
-    else:
-        # display results
-        return render_template('recordSearch.html', results=results)
+@app.route('/medicalRecord/search', methods=['GET'])
+def search_medical_records():
+    form = MedicalRecordForm()
+
+    return render_template('recordSearch.html', form=form)
+
+
+@app.route('/medicalRecord/search', methods=['POST'])
+def medical_records_search_list():
+    search = MedicalRecordForm()
+
+    if search.search.data:
+        if search.validate_on_submit():
+            first = search.patientFirstName.data
+            last = search.patientLastName.data
+
+            # diagnosis = Diagnosis.query.order_by(Diagnosis.disease)
+            # patients = Patient.query.order_by(Patient.first_name)
+            # allergies = Allergy.query.order_by(Allergy.allergyMedication)
+
+            diagnosis = db.session.query(Diagnosis)
+            patients = db.session.query(Patient)
+            allergies = db.session.query(Allergy)
+
+            if first:
+                print('First ', first)
+                # diagnosis = diagnosis.filter(Allergy.patientFirstName == first)
+                patients = patients.filter(Patient.first_name == first)
+                allergies = allergies.filter(Allergy.patientFirstName == first)
+
+            if last:
+                print('Last ', last)
+                # diagnosis = diagnosis.filter(Diagnosis. == last)
+                patients = patients.filter(Patient.last_name == last)
+                allergies = allergies.filter(Allergy.patientLastName == last)
+
+            return render_template('recordList.html',
+                                   diagnosis=diagnosis.all(),
+                                   patients=patients.all(),
+                                   allergies=allergies.all())
+
+    return render_template('recordSearch.html', form=search)
 
 
 @app.route('/list')
 def list_medical_records():
-    records = MedicalRecord.query.order_by(MedicalRecord.patientFirst).all()
-    return render_template('recordList.html', records=records)
+    diagnosis = db.session.query(Diagnosis).order_by(Diagnosis.disease).all()
+    patients = db.session.query(Patient).order_by(Patient.first_name).all()
+    allergies = db.session.query(Allergy).order_by(Allergy.allergyMedication).all()
+    return render_template('recordList.html',
+                           diagnosis=diagnosis,
+                           patients=patients,
+                           allergies=allergies)
 
 
 @app.route('/new', methods=['GET', 'POST'])
 def create_medical_record():
-    form = CreateMedicalRecord()
+    # form = CreateMedicalRecord()
+    diagnosis_form = DiagnosisRecord()
+    patient_form = PatientRecord()
+    allergy_form = AllergyRecord()
 
-    if form.validate_on_submit():
-        if request.method == 'POST':
-            record = MedicalRecord(patientFirst=form.patientFirstName.data,
-                                   patientLast=form.patientLastName.data,
-                                   email=form.patientEmail.data,
-                                   doctorID=form.doctorID.data,
-                                   drFirst=form.doctorFirstName.data,
-                                   drLast=form.doctorLastName.data,
-                                   provider=form.doctorProvider.data,
-                                   disease=form.disease.data,
-                                   condition=form.condition.data,
-                                   treatment=form.treatment.data,
-                                   medication=form.scriptMedication.data,
-                                   strength=form.scriptStrength.data,
-                                   directions=form.scriptDirections.data)
-            try:
-                db.session.add(record)
-                db.session.commit()
-                return redirect('/list')
-            except:
-                return 'There was an error with the database'
-        records = MedicalRecord.query.order_by(MedicalRecord.patientFirst).all()
-        return render_template('recordList.html', records=records)
-        # return flask.redirect(flask.request.args.get('next') or flask.url_for('home'))
+    if request.method == 'POST':
+        if diagnosis_form.createDiagnosis.data:
+            print("diagnosis_form Is Submitted ", diagnosis_form.createDiagnosis.data)
+            if diagnosis_form.validate_on_submit():
+                record = Diagnosis(disease=diagnosis_form.disease.data,
+                                   condition=diagnosis_form.condition.data,
+                                   treatment=diagnosis_form.treatment.data)
+                try:
+                    db.session.add(record)
+                    db.session.commit()
+                    return redirect('/list')
+                except:
+                    print("ERROR Diagnosis Record Creation")
+                    return 'There was an error with the database'
+
+        elif patient_form.createPatient.data:
+            print("patient_form Is Submitted ", patient_form.createPatient.data)
+            if patient_form.validate_on_submit():
+                record = Patient(first_name=patient_form.patientFirstName.data,
+                                 last_name=patient_form.patientLastName.data,
+                                 email=patient_form.patientEmail.data)
+                try:
+                    db.session.add(record)
+                    db.session.commit()
+                    return redirect('/list')
+                except:
+                    print("ERROR Patient Record Creation")
+                    return 'There was an error with the database'
+
+        elif allergy_form.createAllergy.data:
+            print("allergy_form Is Submitted ", allergy_form.createAllergy.data)
+            if allergy_form.validate_on_submit():
+                record = Allergy(patientFirstName=allergy_form.patientFirstName.data,
+                                 patientLastName=allergy_form.patientLastName.data,
+                                 allergyMedication=allergy_form.allergyMedication.data,
+                                 allergyDescription=allergy_form.allergyDescription.data,
+                                 # dateEntered=allergyForm.dateEntered.data,
+                                 createdBy=allergy_form.createdBy.data)
+
+                try:
+                    db.session.add(record)
+                    db.session.commit()
+                    print("Allergy created")
+                    return redirect('/list')
+                except:
+                    print("ERROR Allergy Record Creation")
+                    return 'There was an error with the database'
     else:
-        return render_template('recordForm.html', form=form)
+        return render_template('recordForm.html',
+                               diagnosisForm=diagnosis_form,
+                               patientForm=patient_form,
+                               allergyForm=allergy_form)
+    return redirect('/home')
 
 
 @app.route('/newPrescription', methods=['GET', 'POST'])
 def create_prescription():
+    prescription = Prescription()
     form = PrescriptionForm()
     if form.validate_on_submit():
         if request.method == 'POST':
@@ -191,7 +248,7 @@ def create_prescription():
 
 @app.route('/prescriptionList')
 def list_prescriptions():
-    prescriptions = Prescription.query.order_by(Prescription.patientFirst).all()
+    prescriptions = db.session.query(Prescription).order_by(Prescription.patientFirst).all()
     return render_template('prescriptionList.html', prescriptions=prescriptions)
 
 
