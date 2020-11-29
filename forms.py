@@ -25,8 +25,7 @@ class PrescriptionForm(FlaskForm):
     strength = IntegerField(u'Strength', validators=[DataRequired()])
     quantity = IntegerField(u'Quantity', validators=[DataRequired()])
     directions = StringField(u'Directions', validators=[DataRequired()])
-    # Saved for later
-    # sentToPharmacy = StringField(u'Hello', validators=[DataRequired()])
+    isSent = None
     create = SubmitField(u'Create')
 
 

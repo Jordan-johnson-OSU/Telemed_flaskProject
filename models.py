@@ -45,6 +45,8 @@ class IndexTest(db.Model):
 class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     doctorID = db.Column(db.String(50))
+    isActive = True
+    isAuthenticated = True
     first_name = db.Column(db.String(50))
     last_name = db.Column(db.String(50))
     provider = db.Column(db.String(50))
@@ -74,6 +76,7 @@ class Prescription(db.Model):
     medication = db.Column(db.String(50), nullable=False)
     strength = db.Column(db.String(50), nullable=False)
     quantity = db.Column(db.Integer(), nullable=False)
+    isSent = None
     directions = db.Column(db.String(80), nullable=False)
 
 
