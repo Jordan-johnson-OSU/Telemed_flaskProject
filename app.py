@@ -229,12 +229,13 @@ def create_prescription():
     prescription = Prescription()
     form = PrescriptionForm()
     if form.validate_on_submit():
-        if request.method == 'POST':
+        if request.method == 'POST' and Doctor.isAuthenticated and Doctor.isActive:
             prescription = Prescription(patientFirst=form.patientFirst.data,
                                         patientLast=form.patientLast.data,
                                         medication=form.medication.data,
                                         strength=form.strength.data,
                                         quantity=form.quantity.data,
+                                        isSent=True,
                                         directions=form.directions.data)
         try:
             db.session.add(prescription)
