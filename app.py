@@ -93,7 +93,7 @@ def login():
 # @login_required
 def logout():
     # do logout
-    return render_template('index.html')
+    return render_template('home.html')
 
 
 @app.route('/home')
@@ -104,7 +104,7 @@ def home():
 # Added by RoperFV, found on Flask 101
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    return render_template('home.html')
 
 
 # Added by RoperFV, found on Flask 101
@@ -124,23 +124,17 @@ def medical_records_search_list():
             first = search.patientFirstName.data
             last = search.patientLastName.data
 
-            # diagnosis = Diagnosis.query.order_by(Diagnosis.disease)
-            # patients = Patient.query.order_by(Patient.first_name)
-            # allergies = Allergy.query.order_by(Allergy.allergyMedication)
-
             diagnosis = db.session.query(Diagnosis)
             patients = db.session.query(Patient)
             allergies = db.session.query(Allergy)
 
             if first:
                 print('First ', first)
-                # diagnosis = diagnosis.filter(Allergy.patientFirstName == first)
                 patients = patients.filter(Patient.first_name == first)
                 allergies = allergies.filter(Allergy.patientFirstName == first)
 
             if last:
                 print('Last ', last)
-                # diagnosis = diagnosis.filter(Diagnosis. == last)
                 patients = patients.filter(Patient.last_name == last)
                 allergies = allergies.filter(Allergy.patientLastName == last)
 
@@ -267,34 +261,23 @@ def prescriptions_search_list():
 
     if search.search.data:
         if search.validate_on_submit():
-            first = search.patientFirst.data
-            last = search.patientLast.data
+            pfirst = search.patientFirst.data
+            plast = search.patientLast.data
 
-            # diagnosis = Diagnosis.query.order_by(Diagnosis.disease)
-            # patients = Patient.query.order_by(Patient.first_name)
-            # allergies = Allergy.query.order_by(Allergy.allergyMedication)
-
-            # diagnosis = db.session.query(Diagnosis)
             patients = db.session.query(Prescription)
-            # allergies = db.session.query(Allergy)
 
-            if first:
-                print('First ', first)
-                # diagnosis = diagnosis.filter(Allergy.patientFirstName == first)
-                patients = patients.filter(Prescription.patientFirst == first)
-                # allergies = allergies.filter(Allergy.patientFirstName == first)
+            if pfirst:
+                patients = patients.filter(Prescription.patientFirst == pfirst)
+                print('First ', pfirst)
 
-            if last:
-                print('Last ', last)
-                # diagnosis = diagnosis.filter(Diagnosis. == last)
-                patients = patients.filter(Prescription.patientLast == last)
-                # allergies = allergies.filter(Allergy.patientLastName == last)
+            if plast:
+                patients = patients.filter(Prescription.patientLast == plast)
+                print('Last ', plast)
 
             return render_template('prescriptionList.html',
-                                   patients=patients.all())
+                                   prescriptions=patients.all())
 
     return render_template('prescriptionSearch.html', form=search)
-
 
 
 @app.route('/medicalRecord/<record>')
