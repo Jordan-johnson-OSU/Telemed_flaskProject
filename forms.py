@@ -93,3 +93,8 @@ class MedicalRecordForm(FlaskForm):
     patientLastName = StringField(u'Patient Last name')
     search = SubmitField(u'Search')
 
+
+class SearchPrescriptionForm(FlaskForm):
+    patientFirst = StringField(u'Patient First name')
+    patientLast = StringField(u'Patient Last name')
+    search = SubmitField(u'Search')

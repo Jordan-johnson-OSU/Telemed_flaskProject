@@ -5,7 +5,15 @@
 {% block content %}
    <div class="container">
        <div class="col-md-12">
-            {{wtf.quick_form(form)}}
+           <div id="prescription" class="tab-pane fade in active">
+               <h3>Prescription</h3>
+               <p>Enter the Prescription for Patient.....</p>
+               {{wtf.quick_form(form)}}
+           </div>
+       </div>
+    {##
+        {{wtf.quick_form(form)}}
+    #}
        </div>
    </div>
 {%- endblock %}

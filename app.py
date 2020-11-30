@@ -46,7 +46,8 @@ nav.register_element('frontend_top', Navbar(
         Link('Make Payment', '/home'), ),
     Subgroup(
         'Prescriptions',
-        Link('My Prescriptions', '/prescriptionList'),
+        Link('My Prescriptions', '/prescriptionList/search'),
+        Link('List Prescriptions', '/prescriptionList'),
         Link('Pending Prescription', '/home'),
         Link('New Prescription', '/newPrescription'), ),
 ))
@@ -250,6 +251,49 @@ def create_prescription():
 def list_prescriptions():
     prescriptions = db.session.query(Prescription).order_by(Prescription.patientFirst).all()
     return render_template('prescriptionList.html', prescriptions=prescriptions)
+
+
+@app.route('/prescriptionList/search', methods=['GET'])
+def search_prescriptions():
+    form = SearchPrescriptionForm()
+
+    return render_template('prescriptionSearch.html', form=form)
+
+
+@app.route('/prescriptionList/search', methods=['POST'])
+def prescriptions_search_list():
+    search = SearchPrescriptionForm()
+
+    if search.search.data:
+        if search.validate_on_submit():
+            first = search.patientFirst.data
+            last = search.patientLast.data
+
+            # diagnosis = Diagnosis.query.order_by(Diagnosis.disease)
+            # patients = Patient.query.order_by(Patient.first_name)
+            # allergies = Allergy.query.order_by(Allergy.allergyMedication)
+
+            # diagnosis = db.session.query(Diagnosis)
+            patients = db.session.query(Prescription)
+            # allergies = db.session.query(Allergy)
+
+            if first:
+                print('First ', first)
+                # diagnosis = diagnosis.filter(Allergy.patientFirstName == first)
+                patients = patients.filter(Prescription.patientFirst == first)
+                # allergies = allergies.filter(Allergy.patientFirstName == first)
+
+            if last:
+                print('Last ', last)
+                # diagnosis = diagnosis.filter(Diagnosis. == last)
+                patients = patients.filter(Prescription.patientLast == last)
+                # allergies = allergies.filter(Allergy.patientLastName == last)
+
+            return render_template('prescriptionList.html',
+                                   patients=patients.all())
+
+    return render_template('prescriptionSearch.html', form=search)
+
 
 
 @app.route('/medicalRecord/<record>')
