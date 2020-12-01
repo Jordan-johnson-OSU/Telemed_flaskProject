@@ -48,6 +48,7 @@ nav.register_element('frontend_top', Navbar(
         'Prescriptions',
         Link('My Prescriptions', '/prescriptionList/search'),
         Link('List Prescriptions', '/prescriptionList'),
+        Link('Search Patient Prescriptions', '/patientPrescriptions/search'),
         Link('Pending Prescription', '/home'),
         Link('New Prescription', '/newPrescription'), ),
 ))
@@ -284,6 +285,30 @@ def prescriptions_search_list():
 def show_medical_record(record):
     print('Medical Record  %s' % record)
     return render_template('recordList.html')
+
+
+# Added by EthanGV
+@app.route('/patientPrescriptions/search', methods=['GET'])
+def search_patient_prescriptions():
+    form = SearchPrescriptionForm()
+
+    return render_template('prescriptionSearch.html', form=form)
+
+
+@app.route('/patientPrescriptions/search', methods=['POST'])
+def search_patient_prescriptions_list():
+    search = SearchPrescriptionForm()
+
+    if search.search.data:
+        if search.validate_on_submit():
+            patientFirst = search.patientFirst.data
+            patientLast = search.patientLast.data
+
+            prescription = db.session.query(Prescription).filter(Prescription.patientFirst == patientFirst).filter(Prescription.patientLast == patientLast)
+
+            return render_template('patientPrescriptionsList.html',prescriptions=prescription.all())
+
+    return render_template('prescriptionSearch.html', form=search)
 
 
 if __name__ == "__main__":
