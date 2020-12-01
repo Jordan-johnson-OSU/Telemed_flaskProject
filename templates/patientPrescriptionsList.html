@@ -1,0 +1,31 @@
+{%- extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+   <div class="container">
+       <div class="col-md-12">
+            <table>
+                <tr>
+                    <th>Patient First Name</th>
+                    <th>Patient Last Name</th>
+                    <th>Medication</th>
+                    <th>Strength</th>
+                    <th>Quantity</th>
+                    <th>Directions</th>
+                </tr>
+                {% for prescription in prescriptions %}
+                    <tr>
+                        <td>{{ prescription.patientFirst }}</td>
+                        <td>{{ prescription.patientLast }}</td>
+                        <td>{{ prescription.medication }}</td>
+                        <td>{{ prescription.strength }}</td>
+                        <td>{{ prescription.quantity }}</td>
+                        <td>{{ prescription.directions }}</td>
+                    </tr>
+
+                {% endfor %}
+            </table>
+       </div>
+   </div>
+{%- endblock %}
